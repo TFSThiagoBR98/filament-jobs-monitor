@@ -2,7 +2,10 @@
 
 namespace Croustibat\FilamentJobsMonitor\Contracts;
 
+use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Builder;
+
 interface QueueMonitorContract
 {
     public function status(): Attribute;
