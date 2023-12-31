@@ -15,4 +15,5 @@ return [
         'enabled' => true,
         'retention_days' => 7,
     ],
+    'model' => \Croustibat\FilamentJobsMonitor\Models\QueueMonitor::class,
 ];

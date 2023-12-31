@@ -3,10 +3,11 @@
 namespace Croustibat\FilamentJobsMonitor\Resources;
 
 use Croustibat\FilamentJobsMonitor\FilamentJobsMonitorPlugin;
-use Croustibat\FilamentJobsMonitor\Models\QueueMonitor;
+use Croustibat\FilamentJobsMonitor\QueueMonitorProvider;
 use Croustibat\FilamentJobsMonitor\Resources\QueueMonitorResource\Pages;
 use Croustibat\FilamentJobsMonitor\Resources\QueueMonitorResource\Widgets\QueueStatsOverview;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -20,7 +21,10 @@ use Illuminate\Support\Str;
 
 class QueueMonitorResource extends Resource
 {
-    protected static ?string $model = QueueMonitor::class;
+    public static function getModel(): string
+    {
+        return QueueMonitorProvider::getQueueModel();
+    }
 
     public static function form(Form $form): Form
     {

@@ -2,6 +2,7 @@
 
 namespace Croustibat\FilamentJobsMonitor\Models;
 
+use Croustibat\FilamentJobsMonitor\Contracts\QueueMonitorContract;
 use Croustibat\FilamentJobsMonitor\FilamentJobsMonitorPlugin;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Support\Facades\Hash;
 
-class QueueMonitor extends Model
+class QueueMonitor extends Model implements QueueMonitorContract
 {
     use HasFactory, Prunable;
 

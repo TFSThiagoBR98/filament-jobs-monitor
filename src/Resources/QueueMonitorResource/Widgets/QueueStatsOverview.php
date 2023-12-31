@@ -3,6 +3,7 @@
 namespace Croustibat\FilamentJobsMonitor\Resources\QueueMonitorResource\Widgets;
 
 use Croustibat\FilamentJobsMonitor\Models\QueueMonitor;
+use Croustibat\FilamentJobsMonitor\QueueMonitorProvider;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Card;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,7 @@ class QueueStatsOverview extends BaseWidget
             DB::raw('AVG(finished_at - started_at) as average_time_elapsed'),
         ];
 
-        $aggregatedInfo = QueueMonitor::query()
+        $aggregatedInfo = (QueueMonitorProvider::getQueueModel())::query()
             ->select($aggregationColumns)
             ->first();
 

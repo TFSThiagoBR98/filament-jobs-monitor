@@ -2,7 +2,8 @@
 
 namespace Croustibat\FilamentJobsMonitor\Traits;
 
-use Croustibat\FilamentJobsMonitor\Models\QueueMonitor;
+use Croustibat\FilamentJobsMonitor\Contracts\QueueMonitorContract;
+use Croustibat\FilamentJobsMonitor\QueueMonitorProvider;
 
 trait QueueProgress
 {
@@ -27,7 +28,7 @@ trait QueueProgress
     /**
      * Return Queue Monitor Model.
      */
-    protected function getQueueMonitor(): ?QueueMonitor
+    protected function getQueueMonitor(): ?QueueMonitorContract
     {
         if (! property_exists($this, 'job')) {
             return null;
@@ -37,11 +38,11 @@ trait QueueProgress
             return null;
         }
 
-        if (! $jobId = QueueMonitor::getJobId($this->job)) {
+        if (! $jobId = (QueueMonitorProvider::getQueueModel())::getJobId($this->job)) {
             return null;
         }
 
-        $model = QueueMonitor::getModel();
+        $model = QueueMonitorProvider::getQueueModel();
 
         return $model::whereJobId($jobId)
             ->orderBy('started_at', 'desc')

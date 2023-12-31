@@ -2,6 +2,7 @@
 
 namespace Croustibat\FilamentJobsMonitor;
 
+use Croustibat\FilamentJobsMonitor\Contracts\QueueMonitorContract;
 use Croustibat\FilamentJobsMonitor\Models\QueueMonitor;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\Events\JobExceptionOccurred;
@@ -20,7 +21,6 @@ class QueueMonitorProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
         Queue::before(static function (JobProcessing $event) {
             self::jobStarted($event->job);
         });
@@ -38,12 +38,16 @@ class QueueMonitorProvider extends ServiceProvider
         });
     }
 
+    public static function getQueueModel(): string {
+        return config('filament-jobs-monitor.model') ?? QueueMonitor::class;
+    }
+
     /**
      * Get Job ID.
      */
     public static function getJobId(JobContract $job): string|int
     {
-        return QueueMonitor::getJobId($job);
+        return (self::getQueueModel())::getJobId($job);
     }
 
     /**
@@ -54,7 +58,7 @@ class QueueMonitorProvider extends ServiceProvider
         $now = now();
         $jobId = self::getJobId($job);
 
-        $monitor = QueueMonitor::query()->create([
+        $monitor = (self::getQueueModel())::query()->create([
             'job_id' => $jobId,
             'name' => $job->resolveName(),
             'queue' => $job->getQueue(),
@@ -63,12 +67,12 @@ class QueueMonitorProvider extends ServiceProvider
             'progress' => 0,
         ]);
 
-        QueueMonitor::query()
+        (self::getQueueModel())::query()
             ->where('id', '!=', $monitor->id)
             ->where('job_id', $jobId)
             ->where('failed', false)
             ->whereNull('finished_at')
-            ->each(function (QueueMonitor $monitor) {
+            ->each(function (QueueMonitorContract $monitor) {
                 $monitor->finished_at = now();
                 $monitor->failed = true;
                 $monitor->save();
@@ -80,7 +84,7 @@ class QueueMonitorProvider extends ServiceProvider
      */
     protected static function jobFinished(JobContract $job, bool $failed = false, ?\Throwable $exception = null): void
     {
-        $monitor = QueueMonitor::query()
+        $monitor = (self::getQueueModel())::query()
             ->where('job_id', self::getJobId($job))
             ->where('attempt', $job->attempts())
             ->orderByDesc('started_at')
